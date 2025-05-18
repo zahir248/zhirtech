@@ -38,7 +38,7 @@
         <div class="tab-pane fade show active" id="services" role="tabpanel" aria-labelledby="services-tab">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Services</h5>
-            <button class="btn btn-primary btn-sm">
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createServiceModal">
               <i class="bi bi-plus-lg"></i>
             </button>
           </div>
@@ -360,7 +360,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
         </div>
         <form id="editServiceForm" method="POST">
           @csrf
@@ -376,7 +376,7 @@
             </div>
             <div class="mb-3">
               <label for="editPrice" class="form-label">Price (RM)</label>
-              <input type="number" step="0.01" class="form-control" id="editPrice" name="price" required>
+              <input type="number" step="1.0" class="form-control" id="editPrice" name="price" required>
             </div>
             <div class="mb-3">
               <label for="editNote" class="form-label">Note</label>
@@ -386,6 +386,43 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Service Modal -->
+  <div class="modal fade" id="createServiceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="createServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createServiceModalLabel">Add New Service</h5>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        <form id="createServiceForm" method="POST" action="{{ route('admin.services.store') }}">
+          @csrf
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="createName" class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="createName" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="createDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="createDescription" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="createPrice" class="form-label">Price (RM) <span class="text-danger">*</span></label>
+              <input type="number" step="1.0" class="form-control" id="createPrice" name="price" required>
+            </div>
+            <div class="mb-3">
+              <label for="createNote" class="form-label">Note</label>
+              <input type="text" class="form-control" id="createNote" name="note">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Service</button>
           </div>
         </form>
       </div>
@@ -550,6 +587,18 @@
         document.getElementById('editDescription').value = description;
         document.getElementById('editPrice').value = price;
         document.getElementById('editNote').value = note;
+      });
+    }
+  });
+
+  // Create service modal handling
+  document.addEventListener('DOMContentLoaded', function() {
+    const createServiceModal = document.getElementById('createServiceModal');
+    
+    if (createServiceModal) {
+      createServiceModal.addEventListener('show.bs.modal', function() {
+        // Reset the form when modal is shown
+        document.getElementById('createServiceForm').reset();
       });
     }
   });

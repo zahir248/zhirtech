@@ -94,4 +94,24 @@ class AdminController extends Controller
         }
     }
 
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric|min:0',
+                'note' => 'nullable|string|max:255',
+            ]);
+
+            Service::create($validated);
+
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Service created successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Failed to create service: ' . $e->getMessage());
+        }
+    }
+
 }

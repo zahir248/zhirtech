@@ -35,3 +35,6 @@ Route::delete('/services/{service}', [AdminController::class, 'destroy'])
 
 Route::put('/services/{service}', [AdminController::class, 'update'])
     ->name('admin.services.update');
+
+Route::post('/services', [AdminController::class, 'store'])
+    ->name('admin.services.store');
