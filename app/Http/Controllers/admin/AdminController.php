@@ -61,4 +61,16 @@ class AdminController extends Controller
         return redirect()->route('login');
     }
 
+    public function destroy(Service $service)
+    {
+        try {
+            $service->delete();
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Service deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Failed to delete service');
+        }
+    }
+
 }

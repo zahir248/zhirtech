@@ -67,7 +67,12 @@
                         <button class="btn btn-warning btn-sm edit-service" data-id="{{ $service->id }}" title="Edit">
                           <i class="bi bi-pencil-square text-white"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm delete-service" data-id="{{ $service->id }}" title="Delete">
+                        <button class="btn btn-danger btn-sm delete-service" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#deleteServiceModal" 
+                                data-id="{{ $service->id }}" 
+                                data-url="{{ route('admin.services.destroy', $service->id) }}"
+                                title="Delete">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>
@@ -280,13 +285,29 @@
     </div>
   </div>
 
+  <!-- Message Modal -->
+  <div class="modal fade" id="messageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="messageModalLabel">Notification</h5>
+        </div>
+        <div class="modal-body" id="messageModalBody">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Logout Confirmation Modal -->
   <div class="modal fade" id="logoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           Are you sure you want to logout?
@@ -302,49 +323,33 @@
     </div>
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteServiceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteServiceModalLabel">Confirm Delete</h5>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this service? This action cannot be undone.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <form id="deleteServiceForm" method="POST">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
 
     document.addEventListener('DOMContentLoaded', function() {
-      // Edit service button click handler
-      document.querySelectorAll('.edit-service').forEach(button => {
-        button.addEventListener('click', function() {
-          const serviceId = this.getAttribute('data-id');
-          // Here you would typically show a modal or redirect to edit page
-          alert('Edit service with ID: ' + serviceId);
-          // Example: window.location.href = '/admin/services/' + serviceId + '/edit';
-        });
-      });
-
-      // Delete service button click handler
-      document.querySelectorAll('.delete-service').forEach(button => {
-        button.addEventListener('click', function() {
-          const serviceId = this.getAttribute('data-id');
-          if (confirm('Are you sure you want to delete this service?')) {
-            // Here you would typically make an AJAX request or form submission
-            alert('Delete service with ID: ' + serviceId);
-            // Example: 
-            // fetch('/admin/services/' + serviceId, {
-            //   method: 'DELETE',
-            //   headers: {
-            //     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            //   }
-            // }).then(response => {
-            //   if (response.ok) {
-            //     location.reload();
-            //   }
-            // });
-          }
-        });
-      });
-
-      // Add new service button click handler
-      document.querySelector('#services .btn-primary').addEventListener('click', function() {
-        // Here you would typically show a modal or redirect to create page
-        alert('Add new service');
-        // Example: window.location.href = '/admin/services/create';
-      });
 
       // Transaction filtering functionality
       const statusFilter = document.getElementById('statusFilter');
@@ -422,17 +427,59 @@
     document.addEventListener('DOMContentLoaded', function() {
       const logoutForm = document.getElementById('logoutForm');
       
-      // If you want to handle the form submission via JavaScript
       logoutForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        // You can add any additional logout logic here if needed
         this.submit();
       });
+    });
+
+    // Delete service modal handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const deleteServiceModal = document.getElementById('deleteServiceModal');
       
-      // Alternative: You can also just let the form submit normally
-      // and remove the JavaScript event listener above
+      if (deleteServiceModal) {
+        deleteServiceModal.addEventListener('show.bs.modal', function(event) {
+          const button = event.relatedTarget;
+          const serviceId = button.getAttribute('data-id');
+          const deleteUrl = button.getAttribute('data-url');
+          
+          const form = deleteServiceModal.querySelector('#deleteServiceForm');
+          form.action = deleteUrl;
+        });
+      }
     });
     
+    document.addEventListener('DOMContentLoaded', function() {
+    @if(session('success') || session('error'))
+      const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+      const modalBody = document.getElementById('messageModalBody');
+      const modalHeader = document.getElementById('messageModal').querySelector('.modal-header');
+      
+      @if(session('success'))
+        modalHeader.classList.add('bg-success', 'text-white');
+        document.getElementById('messageModalLabel').textContent = 'Success';
+        modalBody.innerHTML = `
+          <div class="d-flex align-items-center">
+            <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 1.5rem;"></i>
+            <span>{{ session('success') }}</span>
+          </div>
+        `;
+        messageModal.show();
+      @endif
+      
+      @if(session('error'))
+        modalHeader.classList.add('bg-danger', 'text-white');
+        document.getElementById('messageModalLabel').textContent = 'Error';
+        modalBody.innerHTML = `
+          <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill text-danger me-2" style="font-size: 1.5rem;"></i>
+            <span>{{ session('error') }}</span>
+          </div>
+        `;
+        messageModal.show();
+      @endif
+    @endif
+  });
   </script>
 </body>
 </html>

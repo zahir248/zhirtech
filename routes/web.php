@@ -29,3 +29,6 @@ Route::middleware('auth')->group(function () {
     return redirect()->route('admin.dashboard'); 
 });
 });
+
+Route::delete('/services/{service}', [AdminController::class, 'destroy'])
+    ->name('admin.services.destroy');
