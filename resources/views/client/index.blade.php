@@ -136,7 +136,7 @@
 </footer>
 
 <!-- Payment Status Modal -->
-<div id="statusModal" class="modal">
+<div id="statusModal" data-bs-backdrop="static" data-bs-keyboard="false" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <span class="close-modal">&times;</span>
