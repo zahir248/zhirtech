@@ -12,10 +12,10 @@
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
       <span class="navbar-brand">Admin Dashboard</span>
-      <form method="POST" action="{{ route('admin.logout') }}">
+      <form method="POST" action="{{ route('admin.logout') }}" class="d-none" id="logoutForm">
         @csrf
-        <button class="btn btn-outline-light btn-sm">Logout</button>
       </form>
+      <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
     </div>
   </nav>
 
@@ -280,6 +280,28 @@
     </div>
   </div>
 
+  <!-- Logout Confirmation Modal -->
+  <div class="modal fade" id="logoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to logout?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <form id="logoutForm" method="POST" action="{{ route('admin.logout') }}">
+            @csrf
+            <button type="submit" class="btn btn-danger">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
@@ -394,6 +416,21 @@
       // Initialize with all orders showing
       filterOrders();
 
+    });
+
+    // Logout confirmation modal handling
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutForm = document.getElementById('logoutForm');
+      
+      // If you want to handle the form submission via JavaScript
+      logoutForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        // You can add any additional logout logic here if needed
+        this.submit();
+      });
+      
+      // Alternative: You can also just let the form submit normally
+      // and remove the JavaScript event listener above
     });
     
   </script>
