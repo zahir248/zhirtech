@@ -9,6 +9,7 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log; 
 
 class AdminController extends Controller
 {
@@ -70,6 +71,26 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('admin.dashboard')
                 ->with('error', 'Failed to delete service');
+        }
+    }
+
+    public function update(Request $request, Service $service)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric|min:0',
+                'note' => 'nullable|string|max:255',
+            ]);
+
+            $service->update($validated);
+
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Service updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Failed to update service');
         }
     }
 

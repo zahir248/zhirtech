@@ -9,7 +9,7 @@ class Service extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'price'];
+    protected $fillable = ['name', 'description', 'price', 'note'];
 
     public function orders()
     {

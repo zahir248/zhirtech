@@ -64,7 +64,16 @@
                     <td>{{ $service->note }}</td>
                     <td>
                       <div class="action-buttons">
-                        <button class="btn btn-warning btn-sm edit-service" data-id="{{ $service->id }}" title="Edit">
+                        <button class="btn btn-warning btn-sm edit-service" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editServiceModal" 
+                                data-id="{{ $service->id }}"
+                                data-url="{{ route('admin.services.update', $service->id) }}"
+                                data-name="{{ $service->name }}"
+                                data-description="{{ $service->description }}"
+                                data-price="{{ $service->price }}"
+                                data-note="{{ $service->note }}"
+                                title="Edit">
                           <i class="bi bi-pencil-square text-white"></i>
                         </button>
                         <button class="btn btn-danger btn-sm delete-service" 
@@ -345,6 +354,44 @@
     </div>
   </div>
 
+  <!-- Edit Service Modal -->
+  <div class="modal fade" id="editServiceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editServiceForm" method="POST">
+          @csrf
+          @method('PUT')
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="editName" class="form-label">Name</label>
+              <input type="text" class="form-control" id="editName" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="editDescription" class="form-label">Description</label>
+              <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="editPrice" class="form-label">Price (RM)</label>
+              <input type="number" step="0.01" class="form-control" id="editPrice" name="price" required>
+            </div>
+            <div class="mb-3">
+              <label for="editNote" class="form-label">Note</label>
+              <input type="text" class="form-control" id="editNote" name="note">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
@@ -480,6 +527,34 @@
       @endif
     @endif
   });
+
+  // Edit service modal handling
+  document.addEventListener('DOMContentLoaded', function() {
+    const editServiceModal = document.getElementById('editServiceModal');
+    
+    if (editServiceModal) {
+      editServiceModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const serviceId = button.getAttribute('data-id');
+        const editUrl = button.getAttribute('data-url');
+        const name = button.getAttribute('data-name');
+        const description = button.getAttribute('data-description');
+        const price = button.getAttribute('data-price');
+        const note = button.getAttribute('data-note');
+        
+        const form = editServiceModal.querySelector('#editServiceForm');
+        form.action = editUrl;
+        
+        // Populate the form fields
+        document.getElementById('editName').value = name;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editPrice').value = price;
+        document.getElementById('editNote').value = note;
+      });
+    }
+  });
+
   </script>
+
 </body>
 </html>

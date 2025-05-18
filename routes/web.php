@@ -32,3 +32,6 @@ Route::middleware('auth')->group(function () {
 
 Route::delete('/services/{service}', [AdminController::class, 'destroy'])
     ->name('admin.services.destroy');
+
+Route::put('/services/{service}', [AdminController::class, 'update'])
+    ->name('admin.services.update');
