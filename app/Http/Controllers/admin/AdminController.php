@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log; 
+use App\Exports\OrdersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
@@ -112,6 +115,37 @@ class AdminController extends Controller
             return redirect()->route('admin.dashboard')
                 ->with('error', 'Failed to create service: ' . $e->getMessage());
         }
+    }
+
+    public function export(Request $request)
+    {
+        $serviceFilter = $request->query('service', 'all');
+        $exportType = $request->query('type', 'excel');
+        
+        $query = Order::where('status', 'paid')
+            ->with('service')
+            ->orderBy('created_at', 'desc');
+        
+        if ($serviceFilter !== 'all') {
+            $query->whereHas('service', function($q) use ($serviceFilter) {
+                $q->where('name', $serviceFilter);
+            });
+        }
+        
+        $orders = $query->get();
+        $fileName = 'orders_' . now()->format('Ymd_His');
+        
+        if ($exportType === 'pdf') {
+            $pdf = PDF::loadView('admin.export.orders_pdf', [
+                'orders' => $orders,
+                'serviceFilter' => $serviceFilter
+            ])->setPaper('a4', 'landscape');
+            
+            return $pdf->download($fileName . '.pdf');
+        }
+        
+        // Default to Excel
+        return Excel::download(new OrdersExport($orders), $fileName . '.xlsx');
     }
 
 }

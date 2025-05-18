@@ -119,6 +119,15 @@
         <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Orders (Paid Transactions)</h5>
+            <div>
+              <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-download"></i> Export
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item export-option" href="#" data-type="excel">Excel</a></li>
+                <li><a class="dropdown-item export-option" href="#" data-type="pdf">PDF</a></li>
+              </ul>
+            </div>
           </div>
           
           <!-- Add this filter section -->
@@ -601,6 +610,28 @@
         document.getElementById('createServiceForm').reset();
       });
     }
+  });
+
+  // Export orders functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const exportOptions = document.querySelectorAll('.export-option');
+    
+    exportOptions.forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.preventDefault();
+        const exportType = this.getAttribute('data-type');
+        const serviceFilter = document.getElementById('serviceFilter').value;
+        
+        let exportUrl = '{{ route("admin.orders.export") }}';
+        exportUrl += `?type=${exportType}`;
+        
+        if (serviceFilter !== 'all') {
+          exportUrl += `&service=${encodeURIComponent(serviceFilter)}`;
+        }
+        
+        window.location.href = exportUrl;
+      });
+    });
   });
 
   </script>

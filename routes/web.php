@@ -38,3 +38,6 @@ Route::put('/services/{service}', [AdminController::class, 'update'])
 
 Route::post('/services', [AdminController::class, 'store'])
     ->name('admin.services.store');
+
+Route::get('/orders/export', [AdminController::class, 'export'])
+    ->name('admin.orders.export');
